@@ -70,12 +70,18 @@ void m_ReadComplete(void)
 	nokia_lcd_clear();
 	mnu_screen_reset();
 	mnu_items_add_p(PSTR("Card info:\nSynT: \nMan.ID: \nID: \n\n\x1a Save  \x1a Exit"),ReadCompleteMenu_Events);
-	sprintf_P(tstr, PSTR("%02x%02x"), rCard.synT[0], rCard.synT[1]);
-	nokia_lcd_write_string_at(tstr, 36, 8);
-	sprintf_P(tstr, PSTR("%02x"), rCard.cardID[0]);
-	nokia_lcd_write_string_at(tstr, 48, 16);
-	sprintf_P(tstr, PSTR("%02x%02x%02x%02x"), rCard.cardID[1], rCard.cardID[2], rCard.cardID[3], rCard.cardID[4]);
-	nokia_lcd_write_string_at(tstr, 24, 24);
+	//sprintf_P(tstr, PSTR("%02x%02x"), rCard.synT[0], rCard.synT[1]);
+	//nokia_lcd_write_string_at(tstr, 36, 8);
+	nokia_lcd_set_cursor(36, 8);
+	nokia_lcd_write_hex(rCard.synT, 2);
+	//sprintf_P(tstr, PSTR("%02x"), rCard.cardID[0]);
+	//nokia_lcd_write_string_at(tstr, 48, 16);
+	nokia_lcd_set_cursor(48, 16);
+	nokia_lcd_write_hex(rCard.cardID, 1);
+	//sprintf_P(tstr, PSTR("%02x%02x%02x%02x"), rCard.cardID[1], rCard.cardID[2], rCard.cardID[3], rCard.cardID[4]);
+	//nokia_lcd_write_string_at(tstr, 24, 24);
+	nokia_lcd_set_cursor(24, 24);
+	nokia_lcd_write_hex(rCard.cardID+1, 4);
 	t_cell = 0;
 	if (card_find(&rCard, &t_cell) == PROC_CARD_OK)
 	{
@@ -119,8 +125,10 @@ void TransmitCardRefresh(void)
 	sprintf_P(tstr, PSTR("     "));
 	memcpy(tstr, wCard.memo, 5);
 	nokia_lcd_write_string_at(tstr, 36, 16);
-	sprintf_P(tstr, PSTR("%02x%02x%02x%02x%02x"), wCard.cardID[0], wCard.cardID[1], wCard.cardID[2], wCard.cardID[3], wCard.cardID[4]);
-	nokia_lcd_write_string_at(tstr, 24, 32);
+	//sprintf_P(tstr, PSTR("%02x%02x%02x%02x%02x"), wCard.cardID[0], wCard.cardID[1], wCard.cardID[2], wCard.cardID[3], wCard.cardID[4]);
+	//nokia_lcd_write_string_at(tstr, 24, 32);
+	nokia_lcd_set_cursor(24, 32);
+	nokia_lcd_write_hex(wCard.cardID, 5);
 	nokia_lcd_render();
 }
 
@@ -143,8 +151,6 @@ void m_Transmitting(void)
 	mnu_items_add_p(PSTR("Transmit...\n\n\n\n\n\x1a Back"), TransmittingMenu_Events);
 	nokia_lcd_render();
 	rfid_transmit((uint8_t*)&wCard, &btns_pressed, BTN_SEL);
-//	while(!(btns_pressed&BTN_SEL));
-//	m_Transmit();
 }
 
 
@@ -171,8 +177,10 @@ void m_SelectCell(void)
 void SelectCellRefresh(void)
 {
 	//show id
-	sprintf_P(tstr, PSTR("%02x%02x%02x%02x%02x"), rCard.cardID[0],rCard.cardID[1],rCard.cardID[2],rCard.cardID[3],rCard.cardID[4]);
-	nokia_lcd_write_string_at(tstr, 24, 8);
+	//sprintf_P(tstr, PSTR("%02x%02x%02x%02x%02x"), rCard.cardID[0],rCard.cardID[1],rCard.cardID[2],rCard.cardID[3],rCard.cardID[4]);
+	//nokia_lcd_write_string_at(tstr, 24, 8);
+	nokia_lcd_set_cursor(24, 8);
+	nokia_lcd_write_hex(rCard.cardID, 5);
 	//show tcell
 	sprintf_P(tstr, PSTR("%02u"), t_cell);
 	nokia_lcd_write_string_at(tstr, 6, 24);
@@ -219,14 +227,17 @@ void m_EnterName(void)
 	nokia_lcd_set_cursor(0, 24);
 	mnu_items_add_p(PSTR("\x18[     ]\n\n\x1a Save \x1a Exit"), EnterNameMenu_Events);
 	//show card ID
-	sprintf_P(tstr, PSTR("%02x%02x%02x%02x%02x"), rCard.cardID[0],rCard.cardID[1],rCard.cardID[2],rCard.cardID[3],rCard.cardID[4]);
-	nokia_lcd_write_string_at(tstr, 24, 8);
+	//sprintf_P(tstr, PSTR("%02x%02x%02x%02x%02x"), rCard.cardID[0],rCard.cardID[1],rCard.cardID[2],rCard.cardID[3],rCard.cardID[4]);
+	//nokia_lcd_write_string_at(tstr, 24, 8);
+	nokia_lcd_set_cursor(24, 8);
+	nokia_lcd_write_hex(rCard.cardID, 5);
 	EnterNameRefresh();
 }
 
 void EnterNameRefresh(void)
 {
-	sprintf_P(tstr,PSTR("     "));
+	//sprintf_P(tstr,PSTR("     "));
+	tstr[5] = '\0';
 	memcpy(tstr, t_name, 5);
 	nokia_lcd_write_string_at(tstr, 12, 24);
 	nokia_lcd_render();

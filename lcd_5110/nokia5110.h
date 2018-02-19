@@ -75,6 +75,8 @@ void nokia_lcd_write_string(const char *str);
 
 void nokia_lcd_write_string_at(const char *str,uint8_t x, uint8_t y);
 
+void nokia_lcd_write_hex(uint8_t* d, uint8_t len);
+
 /**
  * Set cursor position
  * @x: horizontal position

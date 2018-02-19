@@ -204,6 +204,22 @@ void nokia_lcd_write_string_at(const char *str,uint8_t x, uint8_t y){
 	nokia_lcd.cursor_y = iy;
 }
 
+void nokia_lcd_write_hex(uint8_t* d, uint8_t len){
+	uint8_t i;
+	while(len--)
+	{
+		//print h
+		i=(*d)>>4;
+		i = (i < 10) ? i+'0' : i+('a'-10);
+		nokia_lcd_write_char(i);
+		//print l
+		i=(*d) & 0x0f;
+		i = (i < 10) ? i+'0' : i+('a'-10);
+		nokia_lcd_write_char(i);
+		d++;
+	}
+}
+
 void nokia_lcd_set_cursor(uint8_t x, uint8_t y)
 {
 	nokia_lcd.cursor_x = x;
