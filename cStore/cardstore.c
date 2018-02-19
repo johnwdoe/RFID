@@ -9,6 +9,9 @@
 #include <avr/eeprom.h>
 #include <string.h>
 
+EEMEM uint8_t cards[] = {0x11, 0x33, 0x55, 0x33, 0xde, 0x3f, 0x11, 'c', 'a', 'r', 'd', '1',
+		0x11, 0x33, 0x55, 0xf3, 0xde, 0x3f, 0x11, 'c', 'a', 'r', 'd', '2'};
+
 uint8_t card_find(card* c, uint8_t* cell)
 {
 	//TODO return first free cell when card not found
@@ -45,17 +48,13 @@ uint8_t card_get(card* c, uint8_t cell)
  */
 uint8_t card_get_first(card* c, uint8_t* cell)
 {
-	uint16_t tmp;
-	uint8_t cell_i = 0xFF; //next is 0
-	do {
-		cell_i++;
-		if (cell_i == CARDS_STORE_COUNT) return PROC_CARD_NOT_FOUND;
-		eeprom_read_block((void*)&tmp, (void*)(cell_i*sizeof(card)), 2);
-	}while (tmp == 0xFFFF); //while cell is empty
-	//card found at cell_i
-	eeprom_read_block((void*)c, (void*)(cell_i*sizeof(card)), sizeof(card));
-	*cell = cell_i;
-	return PROC_CARD_OK;
+	uint8_t cell_i = CARDS_STORE_COUNT-1; //last cell number
+	if (card_get_next(c, &cell_i, 1) == PROC_CARD_OK)
+	{
+		*cell = cell_i; //return cell
+		return PROC_CARD_OK;
+	}
+	return PROC_CARD_NOT_FOUND;
 }
 
 uint8_t card_get_next(card* c, uint8_t* cell, int8_t direction)

@@ -23,8 +23,7 @@ void mnu_forward(void)
 void mnu_select(void)
 {
 	void(*f)(void) = menu_cache.items[menu_cache.active_item].evt;
-	if (f == NULL) return; //do nothing
-	f();
+	if (f != NULL) f();
 }
 
 void mnu_screen_reset(void)

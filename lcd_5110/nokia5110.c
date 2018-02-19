@@ -193,7 +193,7 @@ void nokia_lcd_write_string(const char *str)
 }
 
 void nokia_lcd_write_string_at(const char *str,uint8_t x, uint8_t y){
-	uint8_t ix, iy;
+	/*uint8_t ix, iy;
 	ix = nokia_lcd.cursor_x;
 	iy = nokia_lcd.cursor_y;
 	nokia_lcd.cursor_x = x;
@@ -201,7 +201,9 @@ void nokia_lcd_write_string_at(const char *str,uint8_t x, uint8_t y){
 	nokia_lcd_write_string(str);
 	//rollback coords
 	nokia_lcd.cursor_x = ix;
-	nokia_lcd.cursor_y = iy;
+	nokia_lcd.cursor_y = iy;*/
+	nokia_lcd_set_cursor(x, y);
+	nokia_lcd_write_string(str);
 }
 
 void nokia_lcd_write_hex(uint8_t* d, uint8_t len){

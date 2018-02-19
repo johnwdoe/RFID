@@ -70,7 +70,7 @@ void m_ReadComplete(void)
 {
 	nokia_lcd_clear();
 	mnu_screen_reset();
-	mnu_items_add_p(PSTR("Card info:\nSynT: \nMan.ID: \nID: \n\n\x1a Save  \x1a Exit"),ReadCompleteMenu_Events);
+	mnu_items_add_p(PSTR("Card data:\nSynT: \nMan.ID: \nID: \n\n\x1a Save  \x1a Exit"),ReadCompleteMenu_Events);
 	//sprintf_P(tstr, PSTR("%02x%02x"), rCard.synT[0], rCard.synT[1]);
 	//nokia_lcd_write_string_at(tstr, 36, 8);
 	nokia_lcd_set_cursor(36, 8);
@@ -157,14 +157,24 @@ void m_Transmitting(void)
 
 void m_Info(void)
 {
+	card t_card;
+	uint8_t t_cell = CARDS_STORE_COUNT, t_count = 0;
+
+	//calc cards count
+	while(t_cell--)
+	{
+		if (card_get(&t_card, t_cell) == PROC_CARD_OK) t_count++;
+	}
+
+	sprintf_P(tstr, PSTR("%02u/%02u"), t_count, CARDS_STORE_COUNT);
 
 	nokia_lcd_clear();
 	mnu_screen_reset();
 	//sprintf_P(tstr, PSTR("%04umV"), adc_batt_measure());
-	mnu_items_add_p(PSTR("Info:\nBatt.: \nStorage: xx/xx\n\n\x1a Exit"), ReadingMenu_Events);
-	//nokia_lcd_write_string_at(tstr, 42, 8);
+	mnu_items_add_p(PSTR("Info:\nBatt.:\nStorage:\n\n\n\x1a Exit"), ReadingMenu_Events);
+	nokia_lcd_write_string_at(tstr, 54, 16);
 	nokia_lcd_render();
-	buttons_v_delegate(InfoVoltageRefresh, 64);
+	buttons_v_delegate(InfoVoltageRefresh, 32);
 }
 
 void InfoVoltageRefresh(void)
@@ -230,7 +240,7 @@ void m_EnterName(void)
 	//init static data
 	nokia_lcd_clear();
 	mnu_screen_reset();
-	mnu_items_add_p(PSTR("Enter name\nID: \n  \x1c\n\n  \x1e"), EnterNameMenu_Events);
+	mnu_items_add_p(PSTR("Enter name\nID:\n  \x1c\n\n  \x1e"), EnterNameMenu_Events);
 	nokia_lcd_set_cursor(48, 24);
 	mnu_items_add_p(PSTR("\x1a"), EnterNameMenu_Events);
 	nokia_lcd_set_cursor(0, 24);
@@ -291,7 +301,7 @@ void m_Save(void)
 
 void m_Main(void)
 {
-	buttons_v_delegate(NULL, 0);
+	buttons_v_delegate(NULL, 0xFF);
 	nokia_lcd_clear();
 	mnu_screen_reset();
 	mnu_items_add_p(PSTR("Main menu:\n\n\x1a Read\n\x1a Transmit\n\x1a Info"), MainMenu_Events);
