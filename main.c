@@ -62,7 +62,6 @@ void m_Read(void)
 	nokia_lcd_clear();
 	mnu_items_add_p(PSTR("Reading...\n\n\n\n\n\x1a Exit"), ReadingMenu_Events);
 	nokia_lcd_render();
-	//_delay_ms(200);
 	if(rfid_read((uint8_t*)&rCard, &btns_pressed, BTN_SEL) == RFID_RET_OK) m_ReadComplete();
 }
 
@@ -71,16 +70,10 @@ void m_ReadComplete(void)
 	nokia_lcd_clear();
 	mnu_screen_reset();
 	mnu_items_add_p(PSTR("Card data:\nSynT: \nMan.ID: \nID: \n\n\x1a Save  \x1a Exit"),ReadCompleteMenu_Events);
-	//sprintf_P(tstr, PSTR("%02x%02x"), rCard.synT[0], rCard.synT[1]);
-	//nokia_lcd_write_string_at(tstr, 36, 8);
 	nokia_lcd_set_cursor(36, 8);
 	nokia_lcd_write_hex(rCard.synT, 2);
-	//sprintf_P(tstr, PSTR("%02x"), rCard.cardID[0]);
-	//nokia_lcd_write_string_at(tstr, 48, 16);
 	nokia_lcd_set_cursor(48, 16);
 	nokia_lcd_write_hex(rCard.cardID, 1);
-	//sprintf_P(tstr, PSTR("%02x%02x%02x%02x"), rCard.cardID[1], rCard.cardID[2], rCard.cardID[3], rCard.cardID[4]);
-	//nokia_lcd_write_string_at(tstr, 24, 24);
 	nokia_lcd_set_cursor(24, 24);
 	nokia_lcd_write_hex(rCard.cardID+1, 4);
 	t_cell = 0;
@@ -126,8 +119,6 @@ void TransmitCardRefresh(void)
 	sprintf_P(tstr, PSTR("     "));
 	memcpy(tstr, wCard.memo, 5);
 	nokia_lcd_write_string_at(tstr, 36, 16);
-	//sprintf_P(tstr, PSTR("%02x%02x%02x%02x%02x"), wCard.cardID[0], wCard.cardID[1], wCard.cardID[2], wCard.cardID[3], wCard.cardID[4]);
-	//nokia_lcd_write_string_at(tstr, 24, 32);
 	nokia_lcd_set_cursor(24, 32);
 	nokia_lcd_write_hex(wCard.cardID, 5);
 	nokia_lcd_render();
@@ -170,11 +161,10 @@ void m_Info(void)
 
 	nokia_lcd_clear();
 	mnu_screen_reset();
-	//sprintf_P(tstr, PSTR("%04umV"), adc_batt_measure());
 	mnu_items_add_p(PSTR("Info:\nBatt.:\nStorage:\n\n\n\x1a Exit"), ReadingMenu_Events);
 	nokia_lcd_write_string_at(tstr, 54, 16);
 	nokia_lcd_render();
-	buttons_v_delegate(InfoVoltageRefresh, 32);
+	buttons_v_delegate(InfoVoltageRefresh, 32); //~1s
 }
 
 void InfoVoltageRefresh(void)
@@ -186,7 +176,6 @@ void InfoVoltageRefresh(void)
 
 void m_SelectCell(void)
 {
-	//t_cell = 0;
 	nokia_lcd_clear();
 	mnu_screen_reset();
 	mnu_items_add_p(PSTR("Select cell.\nID: \n \x1c\n[  ]\n \x1e\n\x1a Save \x1a Exit"), SelectCellMenu_Events);
@@ -196,11 +185,9 @@ void m_SelectCell(void)
 void SelectCellRefresh(void)
 {
 	//show id
-	//sprintf_P(tstr, PSTR("%02x%02x%02x%02x%02x"), rCard.cardID[0],rCard.cardID[1],rCard.cardID[2],rCard.cardID[3],rCard.cardID[4]);
-	//nokia_lcd_write_string_at(tstr, 24, 8);
 	nokia_lcd_set_cursor(24, 8);
 	nokia_lcd_write_hex(rCard.cardID, 5);
-	//show tcell
+	//show t_cell
 	sprintf_P(tstr, PSTR("%02u"), t_cell);
 	nokia_lcd_write_string_at(tstr, 6, 24);
 	//try read card on cell-position
@@ -221,7 +208,7 @@ void SelectCellRefresh(void)
 
 void m_SelectCellInc(void)
 {
-	t_cell ++;
+	t_cell++;
 	if (t_cell == CARDS_STORE_COUNT) t_cell = 0;
 	SelectCellRefresh();
 }
@@ -235,7 +222,6 @@ void m_SelectCellDec(void)
 
 void m_EnterName(void)
 {
-	//sprintf_P(t_name,PSTR("     "));
 	t_name_pos = 0;
 	//init static data
 	nokia_lcd_clear();
@@ -246,8 +232,6 @@ void m_EnterName(void)
 	nokia_lcd_set_cursor(0, 24);
 	mnu_items_add_p(PSTR("\x18[     ]\n\n\x1a Save \x1a Exit"), EnterNameMenu_Events);
 	//show card ID
-	//sprintf_P(tstr, PSTR("%02x%02x%02x%02x%02x"), rCard.cardID[0],rCard.cardID[1],rCard.cardID[2],rCard.cardID[3],rCard.cardID[4]);
-	//nokia_lcd_write_string_at(tstr, 24, 8);
 	nokia_lcd_set_cursor(24, 8);
 	nokia_lcd_write_hex(rCard.cardID, 5);
 	EnterNameRefresh();
@@ -255,7 +239,6 @@ void m_EnterName(void)
 
 void EnterNameRefresh(void)
 {
-	//sprintf_P(tstr,PSTR("     "));
 	tstr[5] = '\0';
 	memcpy(tstr, t_name, 5);
 	nokia_lcd_write_string_at(tstr, 12, 24);
@@ -312,7 +295,8 @@ int main(void)
 {
 	buttons_init((uint8_t*)&btns_pressed);
 	rfid_ioinit();
-	nokia_lcd_init();//initialize I/O
+	nokia_lcd_init();
+
 	nokia_lcd_clear();
 	nokia_lcd_power(1); //power on display
 
@@ -322,13 +306,11 @@ int main(void)
 		//buttons events
 		if(btns_pressed&BTN_SEEK)
 		{
-			//_delay_ms(100);
 			btns_pressed &= ~BTN_SEEK;
 			mnu_forward();
 		}
 		if(btns_pressed&BTN_SEL)
 		{
-			//_delay_ms(100);
 			btns_pressed &= ~BTN_SEL;
 			mnu_select();
 		}
