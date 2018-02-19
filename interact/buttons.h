@@ -24,5 +24,6 @@
 #define BTN_INTERRUPT (BTN_SEL)
 
 void buttons_init(uint8_t* mask);
+void buttons_v_delegate(void* fn, uint8_t t_repeate);
 
 #endif /* INTERACT_BUTTONS_H_ */

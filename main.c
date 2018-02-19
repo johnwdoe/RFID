@@ -22,6 +22,7 @@
 void m_Read(void);
 void m_Transmit(void);
 void m_Info(void);
+void InfoVoltageRefresh(void);
 void m_Main(void);
 void m_ReadComplete(void);
 void m_SelectCell(void);
@@ -159,8 +160,16 @@ void m_Info(void)
 
 	nokia_lcd_clear();
 	mnu_screen_reset();
-	sprintf_P(tstr, PSTR("%04umV"), adc_batt_measure());
+	//sprintf_P(tstr, PSTR("%04umV"), adc_batt_measure());
 	mnu_items_add_p(PSTR("Info:\nBatt.: \nStorage: xx/xx\n\n\x1a Exit"), ReadingMenu_Events);
+	//nokia_lcd_write_string_at(tstr, 42, 8);
+	nokia_lcd_render();
+	buttons_v_delegate(InfoVoltageRefresh, 64);
+}
+
+void InfoVoltageRefresh(void)
+{
+	sprintf_P(tstr, PSTR("%04umV"), adc_batt_measure());
 	nokia_lcd_write_string_at(tstr, 42, 8);
 	nokia_lcd_render();
 }
@@ -282,6 +291,7 @@ void m_Save(void)
 
 void m_Main(void)
 {
+	buttons_v_delegate(NULL, 0);
 	nokia_lcd_clear();
 	mnu_screen_reset();
 	mnu_items_add_p(PSTR("Main menu:\n\n\x1a Read\n\x1a Transmit\n\x1a Info"), MainMenu_Events);

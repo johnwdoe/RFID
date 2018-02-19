@@ -7,9 +7,12 @@
 
 #include "buttons.h"
 #include <avr/interrupt.h>
+#include <stdio.h>
 
 volatile uint8_t* ext_btns_mask_ptr;
 volatile uint8_t ovf_cnt;
+volatile uint8_t ovfd_cnt, ovfd_init;
+void (*d_evt)(void); //delegate
 
 void buttons_init(uint8_t* mask)
 {
@@ -24,6 +27,14 @@ void buttons_init(uint8_t* mask)
 	TCCR0 |= (1<<CS02 | 1<<CS00); //div by 1024
 	TIMSK |= (1<<TOIE0); //enable OVF interrupt
 	sei();
+}
+
+void buttons_v_delegate(void* fn, uint8_t t_repeat)
+{
+	//set timeout for delegate execution
+	ovfd_init = t_repeat;
+	ovfd_cnt = t_repeat;
+	d_evt = fn;
 }
 
 ISR(INT1_vect)
@@ -41,4 +52,10 @@ ISR(INT1_vect)
 ISR(TIMER0_OVF_vect)
 {
 	if (ovf_cnt) ovf_cnt--;
+	if (!(ovfd_cnt--))
+	{
+		//exec delegate
+		if (d_evt != NULL) d_evt();
+		ovfd_cnt = ovfd_init;
+	}
 }
