@@ -21,6 +21,7 @@
 
 #define BTN_SEEK (1<<PD5)
 #define BTN_SEL (1<<PD3)
+#define BTN_STATE_SLEEP (1<<7) //fuck!!!
 #define BTN_INTERRUPT (BTN_SEL)
 
 void buttons_init(uint8_t* mask);

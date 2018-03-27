@@ -17,6 +17,7 @@
 #include "cStore/cardstore.h"
 #include <avr/sleep.h>
 #include "interact/adc.h"
+#include <avr/interrupt.h>
 
 
 void m_Read(void);
@@ -40,9 +41,10 @@ void m_TransmitSelectCellInc(void);
 void m_TransmitSelectCellDec(void);
 void m_Transmitting(void);
 void TransmitCardRefresh(void);
+void m_Idle(void);
 
 volatile uint8_t btns_pressed;
-const PROGMEM MnuEvent MainMenu_Events[] = {m_Read, m_Transmit, m_Info};
+const PROGMEM MnuEvent MainMenu_Events[] = {m_Read, m_Transmit, m_Info, m_Idle};
 const PROGMEM MnuEvent ReadingMenu_Events[] = {m_Main};
 const PROGMEM MnuEvent TransmittingMenu_Events[] = {m_Transmit};
 const PROGMEM MnuEvent ReadCompleteMenu_Events[] = {m_SelectCell, m_Main};
@@ -281,13 +283,33 @@ void m_Save(void)
 	m_Main();
 }
 
+void m_Idle(void)
+{
+	btns_pressed |= BTN_STATE_SLEEP; //ебучий костыль! флаг, при котором обаботчик прерывания пропускается!
+	_delay_ms(500); //wait some time
+
+	nokia_lcd_power(0);
+
+	//MCUCR &= ~(1<<ISC11);
+	MCUCR |= (1<<SE | 1<<SM1);
+
+	sleep_cpu();
+
+	//MCUCR &= ~(1<<SE);
+
+	//MCUCR |= (1<<ISC11); //on falling edge
+	_delay_ms(500);
+	nokia_lcd_power(1);
+	//GIFR |= (1<<INTF1);
+	btns_pressed &= ~BTN_STATE_SLEEP;
+}
 
 void m_Main(void)
 {
 	buttons_v_delegate(NULL, 0xFF);
 	nokia_lcd_clear();
 	mnu_screen_reset();
-	mnu_items_add_p(PSTR("Main menu:\n\n\x1a Read\n\x1a Transmit\n\x1a Info"), MainMenu_Events);
+	mnu_items_add_p(PSTR("Main menu:\n\n\x1a Read\n\x1a Transmit\n\x1a Info\n\x1a Sleep"), MainMenu_Events);
 	nokia_lcd_render();
 }
 

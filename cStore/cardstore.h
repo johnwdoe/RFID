@@ -11,6 +11,7 @@
 #include <stdint.h>
 
 #define CARDS_STORE_COUNT (40)
+//#define CARDS_STORE_COUNT ((E2END+1)/sizeof(card))
 
 #define PROC_CARD_OK (0)
 #define PROC_CARD_NOT_FOUND (1)

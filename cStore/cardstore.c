@@ -9,12 +9,12 @@
 #include <avr/eeprom.h>
 #include <string.h>
 
-EEMEM uint8_t cards[] = {0x11, 0x33, 0x55, 0x33, 0xde, 0x3f, 0x11, 'c', 'a', 'r', 'd', '1',
+/*EEMEM uint8_t cards[] = {0x11, 0x33, 0x55, 0x33, 0xde, 0x3f, 0x11, 'c', 'a', 'r', 'd', '1',
 		0x11, 0x33, 0x55, 0xf3, 0xde, 0x3f, 0x11, 'c', 'a', 'r', 'd', '2'};
+*/
 
 uint8_t card_find(card* c, uint8_t* cell)
 {
-	//TODO return first free cell when card not found
 	uint8_t cell_i = 0;//*cell;
 	uint8_t tmpbuf[5];
 	while (cell_i < CARDS_STORE_COUNT)

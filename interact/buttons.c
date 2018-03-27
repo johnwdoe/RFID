@@ -19,7 +19,7 @@ void buttons_init(uint8_t* mask)
 	BTNS_DDR &= ~(BTN_SEEK | BTN_SEL); //pins as input
 	BTNS_PORT |= (BTN_SEEK | BTN_SEL); //enable pull-up
 	//configure interrupt
-	MCUCR |= (1<<ISC11); //on falling edge
+	//MCUCR |= (1<<ISC11); //on falling edge
 	GICR |= (1<<INT1); //INT1
 	ext_btns_mask_ptr = mask;
 	ovf_cnt = BTNS_DEBOUNCE_OVFS;
@@ -39,6 +39,7 @@ void buttons_v_delegate(void* fn, uint8_t t_repeat)
 
 ISR(INT1_vect)
 {
+	if (*ext_btns_mask_ptr & BTN_STATE_SLEEP) return;
 	uint8_t pState;
 	if (!ovf_cnt) //process only when timeout expired
 	{
